@@ -1,56 +1,35 @@
 import numpy as np
-
-from models import LinearRegression
-from preprocessing import StandardScaler
-from utils import Pipeline
+from models import LogisticRegression
 from metrics import evaluate
+from preprocessing import StandardScaler
 
-# -----------------------------
-# 1. Create training data
-# -----------------------------
-X = np.array([
-    [1, 2],
-    [2, 3],
-    [4, 5],
-    [3, 6]
-])
+# Dataset
+X = np.array([[0, 0],
+              [1, 0],
+              [0, 1],
+              [1, 1]])
+y = np.array([0, 0, 0, 1])
 
-y = np.array([5, 7, 11, 10])
+# Scale features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
 
-# -----------------------------
-# 2. Create pipeline
-# -----------------------------
-pipeline = Pipeline(steps=[
-    ("scaler", StandardScaler()),
-    ("model", LinearRegression(fit_intercept=True))
-])
+# Initialize and train model
+model = LogisticRegression(learning_rate=0.1, n_iters=1000)
+model.fit(X_scaled, y)
 
-# -----------------------------
-# 3. Fit pipeline
-# -----------------------------
-pipeline.fit(X, y)
-
-# -----------------------------
-# 4. Inspect learned parameters
-# -----------------------------
-model = pipeline.steps[-1][1]
-
+# Print parameters
 print("Intercept:", model.intercept_)
 print("Coefficients:", model.coef_)
 
-# -----------------------------
-# 5. Predict on new data
-# -----------------------------
-X_new = np.array([
-    [5, 5],
-    [1, 1]
-])
+# Predictions
+y_prob = model.predict_proba(X_scaled)
+y_pred = model.predict(X_scaled)
+print("Predicted probabilities:", y_prob)
+print("Predicted classes:", y_pred)
 
-y_pred = pipeline.predict(X_new)
-print("Predictions:", y_pred)
-
-# -----------------------------
-# 6. Evaluate on training data
-# -----------------------------
-mse_score = pipeline.score(X, y, metric="mse")
-print("MSE on training data:", mse_score)
+# Evaluate
+acc = evaluate(y, y_pred, metric='accuracy')
+loss = model._loss(y, y_prob)
+print("Accuracy on training data:", acc)
+print("Log-loss on training data:", loss)

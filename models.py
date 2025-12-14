@@ -50,7 +50,7 @@ class LogisticRegression(BaseModel):
         self.learning_rate = learning_rate
         self.n_iters = n_iters
         # the sigmoid is used to wrap around the linear equation so it returns a value of either 0 or 1 basically a probability of wether it is zero or one 
-        
+
     def _sigmoid(self, z):
         z = np.asarray(z)
         return np.where(
@@ -58,3 +58,54 @@ class LogisticRegression(BaseModel):
             1 / (1 + np.exp(-z)),
             np.exp(z) / (1 + np.exp(z))
     )
+    def _loss(self, y, y_pred):
+        y = np.asarray(y)
+        y_pred = np.asarray(y_pred)
+
+        eps = 1e-15
+        y_pred = np.clip(y_pred, eps, 1 - eps)
+
+        loss = -np.mean(
+            y * np.log(y_pred) + (1 - y) * np.log(1 - y_pred)
+        )
+
+        return loss
+    def fit(self, X, y):
+        X = np.asarray(X)
+        y = np.asarray(y)
+        n_samples, n_features = X.shape
+
+        # Initialize parameters
+        self.coef_ = np.zeros(n_features)
+        self.intercept_ = 0
+
+        # Gradient descent
+        for _ in range(self.n_iters):
+            # Linear model
+            z = X @ self.coef_ + self.intercept_
+
+            # Sigmoid prediction
+            y_hat = self._sigmoid(z)
+
+        # Gradients
+            dw = (1 / n_samples) * (X.T @ (y_hat - y))
+            db = (1 / n_samples) * np.sum(y_hat - y)
+
+        # Parameter update
+            self.coef_ -= self.learning_rate * dw
+            self.intercept_ -= self.learning_rate * db
+
+    # Mark as fitted
+        self.is_fitted = True
+    def predict_proba(self,X):
+        if not self.is_fitted:
+            raise ValueError("Model is not fitted yet")
+        X = np.asarray(X)
+        z = X @ self.coef_ + self.intercept_
+        y_hat = self._sigmoid(z)
+        return y_hat
+    def predict(self, X):
+        if not self.is_fitted:
+            raise ValueError("Model is not fitted yet")
+        y_prob = self.predict_proba(X)
+        return (y_prob >=0.5).astype(int)
