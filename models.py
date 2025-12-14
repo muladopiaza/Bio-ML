@@ -41,3 +41,20 @@ class LinearRegression(BaseModel):
             raise ValueError("The model is not fitted")
         y_pred = X @ self.coef_ + self.intercept_
         return y_pred
+    
+class LogisticRegression(BaseModel):
+    def __init__(self,learning_rate=0.01,n_iters=1000,fit_intercept = True,): # this model will only work with gradient descent optimization hence the learning rate and no of interations 
+
+        super().__init__()
+        self.fit_intercept = fit_intercept
+        self.learning_rate = learning_rate
+        self.n_iters = n_iters
+        # the sigmoid is used to wrap around the linear equation so it returns a value of either 0 or 1 basically a probability of wether it is zero or one 
+        
+    def _sigmoid(self, z):
+        z = np.asarray(z)
+        return np.where(
+            z >= 0,
+            1 / (1 + np.exp(-z)),
+            np.exp(z) / (1 + np.exp(z))
+    )
