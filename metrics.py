@@ -60,6 +60,20 @@ def f1_score(y_true, y_pred):
     return 2 * p * r / (p + r + 1e-15)
 
 
+
+def train_test_split(X, y, test_size=0.2, random_state=None):
+    if random_state is not None:
+        np.random.seed(random_state)
+    
+    n_samples = X.shape[0]
+    indices = np.arange(n_samples)
+    np.random.shuffle(indices)
+    
+    split_idx = int(n_samples * (1 - test_size))
+    train_idx, test_idx = indices[:split_idx], indices[split_idx:]
+    
+    return X[train_idx], X[test_idx], y[train_idx], y[test_idx]
+
 # Unified evaluate function
 
 

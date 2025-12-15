@@ -2,7 +2,7 @@
 import numpy as np
 from abc import ABC, abstractmethod
 
-
+# HERE AGAIN TEMPLATE METHOD IS USED WE HAVE SIMILAR METHODS IN EVERY CHILD CLASS SO WE HAVE AN ABSTRACT PARENT CLASS AND ALL THE CHILDREN INHERIT FROM IT 
 class BaseTransformer(ABC):
     @abstractmethod
     def fit(self, X):
