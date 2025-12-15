@@ -1,14 +1,6 @@
 from models import LinearRegression , LogisticRegression
 from metrics import evaluate
-class ModelFactory:
-    @staticmethod
-    def create(model_name, **kwargs):
-        if model_name == 'LinearRegression':
-            return LinearRegression(**kwargs)
-        elif model_name == "LogisticRegression":
-            return LogisticRegression(**kwargs)
-        else:
-            raise ValueError(f"Unknown model: {model_name}")
+
 class Pipeline:
     def __init__(self, steps):
         self.steps = steps
