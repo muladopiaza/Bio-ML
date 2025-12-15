@@ -1,6 +1,25 @@
+# preprocessing.py
 import numpy as np
+from abc import ABC, abstractmethod
 
-class StandardScaler:
+
+class BaseTransformer(ABC):
+    @abstractmethod
+    def fit(self, X):
+        """Compute any statistics/parameters from X"""
+        pass
+
+    @abstractmethod
+    def transform(self, X):
+        """Apply transformation using computed parameters"""
+        pass
+
+    def fit_transform(self, X):
+        """Convenience method: fit and then transform"""
+        return self.fit(X).transform(X)
+
+
+class StandardScaler(BaseTransformer):
     def fit(self, X):
         self.mean_ = np.mean(X, axis=0)
         self.std_ = np.std(X, axis=0)
@@ -9,13 +28,12 @@ class StandardScaler:
     def transform(self, X):
         return (X - self.mean_) / self.std_
 
-    def fit_transform(self, X):
-        return self.fit(X).transform(X)
-class MinMaxScaler:
+
+class MinMaxScaler(BaseTransformer):
     def __init__(self, feature_range=(0, 1)):
+        self.feature_range = feature_range
         self.min_ = None
         self.max_ = None
-        self.feature_range = feature_range
 
     def fit(self, X):
         self.min_ = np.min(X, axis=0)
@@ -26,9 +44,9 @@ class MinMaxScaler:
         scale = self.feature_range[1] - self.feature_range[0]
         return self.feature_range[0] + (X - self.min_) / (self.max_ - self.min_) * scale
 
-    def fit_transform(self, X):
-        return self.fit(X).transform(X)
-class OneHotEncoder:
+
+
+class OneHotEncoder(BaseTransformer):
     def __init__(self):
         self.categories_ = None
 
@@ -46,9 +64,9 @@ class OneHotEncoder:
             result.append(col)
         return np.hstack(result)
 
-    def fit_transform(self, X):
-        return self.fit(X).transform(X)
-class LabelEncoder:
+
+
+class LabelEncoder(BaseTransformer):
     def __init__(self):
         self.classes_ = None
 
@@ -62,9 +80,8 @@ class LabelEncoder:
             y_transformed[y == cls] = idx
         return y_transformed
 
-    def fit_transform(self, y):
-        return self.fit(y).transform(y)
-class SimpleImputer:
+
+class SimpleImputer(BaseTransformer):
     def __init__(self, strategy='mean', fill_value=None):
         self.strategy = strategy
         self.fill_value = fill_value
@@ -78,7 +95,7 @@ class SimpleImputer:
         elif self.strategy == 'constant':
             self.statistics_ = np.full(X.shape[1], self.fill_value)
         else:
-            raise ValueError("Unknown strategy")
+            raise ValueError(f"Unknown strategy: {self.strategy}")
         return self
 
     def transform(self, X):
@@ -86,6 +103,3 @@ class SimpleImputer:
         inds = np.where(np.isnan(X_new))
         X_new[inds] = np.take(self.statistics_, inds[1])
         return X_new
-
-    def fit_transform(self, X):
-        return self.fit(X).transform(X)
