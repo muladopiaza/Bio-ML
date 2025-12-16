@@ -2,7 +2,7 @@
 import numpy as np
 from abc import ABC, abstractmethod
 
-# HERE AGAIN TEMPLATE METHOD IS USED WE HAVE SIMILAR METHODS IN EVERY CHILD CLASS SO WE HAVE AN ABSTRACT PARENT CLASS AND ALL THE CHILDREN INHERIT FROM IT 
+
 class BaseTransformer(ABC):
     @abstractmethod
     def fit(self, X):
@@ -23,6 +23,8 @@ class StandardScaler(BaseTransformer):
     def fit(self, X):
         self.mean_ = np.mean(X, axis=0)
         self.std_ = np.std(X, axis=0)
+        self.std_ = np.where(self.std_ == 0, 1, self.std_)
+
         return self
 
     def transform(self, X):
@@ -38,6 +40,7 @@ class MinMaxScaler(BaseTransformer):
     def fit(self, X):
         self.min_ = np.min(X, axis=0)
         self.max_ = np.max(X, axis=0)
+        self.max_ = np.where(self.max_ == self.min_, self.min_ + 1, self.max_)
         return self
 
     def transform(self, X):

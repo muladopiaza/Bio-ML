@@ -1,8 +1,7 @@
 from abc import abstractmethod,ABC
 from metrics import evaluate 
 import numpy as np 
-# THE OOP PATTERN USED HERE IS TEMPLATE METHOD 
-# BaseModel has shared attributes among all its children so we make it have abstract methods which are then implemented or overriden by children classes
+
 class BaseModel(ABC):
     def __init__(self):
         self.is_fitted = False
